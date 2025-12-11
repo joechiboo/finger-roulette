@@ -239,11 +239,14 @@
         const isSelected = selectedId === t.id;
         const isLosing = isSelecting && selectedId !== null && !isSelected;
 
-        // 淡出效果
+        // 淡出效果（輸家完全消失）
         let alpha = 1;
         if (isLosing && t.fadeStart) {
-          alpha = Math.max(0.15, 1 - (now - t.fadeStart) / 600);
+          alpha = Math.max(0, 1 - (now - t.fadeStart) / 400);
         }
+
+        // 如果已經完全透明就跳過繪製
+        if (alpha <= 0) return;
 
         const baseRadius = 50;
         const pulse = Math.sin(now / 200) * 5;
