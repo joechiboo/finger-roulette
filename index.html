@@ -36,17 +36,16 @@
     }
     #result {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
       color: #fff;
-      font-size: 2rem;
-      background: rgba(0,0,0,0.6);
-      padding: 20px 40px;
-      border-radius: 30px;
+      font-size: 1.5rem;
+      background: rgba(0,0,0,0.7);
+      padding: 15px 25px;
+      border-radius: 20px;
       opacity: 0;
       transition: opacity 0.3s;
       text-shadow: 0 0 20px rgba(255,255,255,0.5);
+      pointer-events: none;
+      white-space: nowrap;
     }
     #result.show { opacity: 1; }
     #reset {
@@ -419,7 +418,13 @@
           // 爆發粒子特效
           createExplosion(winner.x, winner.y, winner.color.main);
 
-          result.textContent = '🎉 就是你！';
+          // 計算箭頭方向和文字位置
+          const offsetY = winner.y < canvas.height / 2 ? 150 : -150;
+          const arrow = winner.y < canvas.height / 2 ? '👇' : '👆';
+          result.textContent = `${arrow} 就是你！`;
+          result.style.left = winner.x + 'px';
+          result.style.top = (winner.y + offsetY) + 'px';
+          result.style.transform = 'translate(-50%, -50%)';
           result.classList.add('show');
           resetBtn.classList.add('show');
 
