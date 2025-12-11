@@ -421,12 +421,26 @@
           // 爆發粒子特效
           createExplosion(winner.x, winner.y, winner.color.main);
 
-          // 計算箭頭方向和文字位置
-          const offsetY = winner.y < canvas.height / 2 ? 150 : -150;
-          const arrow = winner.y < canvas.height / 2 ? '👇' : '👆';
-          result.textContent = `${arrow} 就是你！`;
-          result.style.left = winner.x + 'px';
-          result.style.top = (winner.y + offsetY) + 'px';
+          // 計算箭頭方向和文字位置（8個方向）
+          const cx = canvas.width / 2;
+          const cy = canvas.height / 2;
+          const dx = winner.x - cx;
+          const dy = winner.y - cy;
+          const angle = Math.atan2(dy, dx);
+
+          // 8方向箭頭
+          const arrows = ['👉', '↘️', '👇', '↙️', '👈', '↖️', '👆', '↗️'];
+          const arrowIndex = Math.round((angle + Math.PI) / (Math.PI / 4)) % 8;
+          const arrow = arrows[arrowIndex];
+
+          // 文字放在贏家的對面
+          const dist = 140;
+          const textX = winner.x - Math.cos(angle) * dist;
+          const textY = winner.y - Math.sin(angle) * dist;
+
+          result.textContent = `就是你！${arrow}`;
+          result.style.left = textX + 'px';
+          result.style.top = textY + 'px';
           result.style.transform = 'translate(-50%, -50%)';
           result.classList.add('show');
           resetBtn.classList.add('show');
