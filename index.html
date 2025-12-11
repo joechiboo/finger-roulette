@@ -112,6 +112,7 @@
     let delaySeconds = 3;
     let scanAngle = 0;
     let explosionParticles = [];
+    let winner = null;  // 保存贏家資訊
 
     const colors = [
       { main: '#ff6b6b', glow: '#ff8787', particle: '#ffaaaa' },
@@ -235,7 +236,14 @@
         ctx.restore();
       }
 
-      touchList.forEach(t => {
+      // 合併觸控列表和贏家（如果贏家手指已離開但需要繼續顯示）
+      let drawList = [...touchList];
+      if (winner && selectedId !== null && !touchList.find(t => t.id === selectedId)) {
+        // 贏家手指已離開，但仍需繪製
+        drawList.push(winner);
+      }
+
+      drawList.forEach(t => {
         const isSelected = selectedId === t.id;
         const isLosing = isSelecting && selectedId !== null && !isSelected;
 
@@ -407,8 +415,10 @@
 
           // 最終選擇
           const winnerIndex = Math.floor(Math.random() * touchList.length);
-          const winner = touchList[winnerIndex];
-          selectedId = winner.id;
+          const winnerTouch = touchList[winnerIndex];
+          selectedId = winnerTouch.id;
+          // 保存贏家資訊，這樣即使手指離開也能繼續顯示
+          winner = { ...winnerTouch };
 
           // 設定淡出開始時間
           const fadeTime = Date.now();
@@ -419,24 +429,26 @@
           });
 
           // 爆發粒子特效
-          createExplosion(winner.x, winner.y, winner.color.main);
+          createExplosion(winnerTouch.x, winnerTouch.y, winnerTouch.color.main);
 
           // 計算箭頭方向和文字位置（8個方向）
           const cx = canvas.width / 2;
           const cy = canvas.height / 2;
-          const dx = winner.x - cx;
-          const dy = winner.y - cy;
+          const dx = winnerTouch.x - cx;
+          const dy = winnerTouch.y - cy;
           const angle = Math.atan2(dy, dx);
 
-          // 8方向箭頭
+          // 8方向箭頭 (從右邊開始順時針)
           const arrows = ['👉', '↘️', '👇', '↙️', '👈', '↖️', '👆', '↗️'];
-          const arrowIndex = Math.round((angle + Math.PI) / (Math.PI / 4)) % 8;
+          // 將角度正規化到 0~2π，然後除以 π/4 得到 0~7 的索引
+          const normalizedAngle = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+          const arrowIndex = Math.round(normalizedAngle / (Math.PI / 4)) % 8;
           const arrow = arrows[arrowIndex];
 
           // 文字放在贏家的對面
           const dist = 140;
-          const textX = winner.x - Math.cos(angle) * dist;
-          const textY = winner.y - Math.sin(angle) * dist;
+          const textX = winnerTouch.x - Math.cos(angle) * dist;
+          const textY = winnerTouch.y - Math.sin(angle) * dist;
 
           result.textContent = `就是你！${arrow}`;
           result.style.left = textX + 'px';
@@ -458,6 +470,7 @@
       particles = [];
       explosionParticles = [];
       selectedId = null;
+      winner = null;
       isSelecting = false;
       scanAngle = 0;
       countdown = null;
@@ -501,12 +514,11 @@
     canvas.addEventListener('touchend', (e) => {
       e.preventDefault();
       if (isSelecting) {
+        // 遊戲結束後，刪除所有觸控點（贏家會從 winner 變數繪製）
         for (const touch of e.changedTouches) {
           delete touches[touch.identifier];
         }
-        if (Object.keys(touches).length === 0) {
-          setTimeout(reset, 500);
-        }
+        // 不自動重置，讓使用者按重置按鈕
         return;
       }
 
@@ -530,8 +542,17 @@
       }
     });
 
-    resetBtn.addEventListener('click', reset);
+    resetBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      reset();
+    });
+    resetBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
     resetBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
       e.stopPropagation();
       reset();
     });
