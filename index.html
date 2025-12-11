@@ -24,11 +24,15 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      color: rgba(255,255,255,0.6);
-      font-size: 1.5rem;
+      color: rgba(255,255,255,0.7);
+      font-size: clamp(1.2rem, 5vw, 1.8rem);
       text-align: center;
       pointer-events: none;
       transition: opacity 0.3s;
+      line-height: 1.8;
+      padding: 0 20px;
+      width: 90%;
+      max-width: 400px;
     }
     #result {
       position: fixed;
