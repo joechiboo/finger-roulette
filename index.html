@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>手指抽籤 v1.1</title>
+  <title>手指抽籤 v1.2</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👆</text></svg>">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -92,7 +92,7 @@
   <div id="settings">
     <label>⏱️ <input type="range" id="delay" min="1" max="5" value="3"> <span id="delay-val">3</span>秒</label>
   </div>
-  <div style="position:fixed;bottom:5px;right:10px;color:rgba(255,255,255,0.3);font-size:12px;">v1.1</div>
+  <div style="position:fixed;bottom:5px;right:10px;color:rgba(255,255,255,0.3);font-size:12px;">v1.2</div>
 
   <script>
     const canvas = document.getElementById('canvas');
@@ -238,11 +238,15 @@
         ctx.restore();
       }
 
-      // 合併觸控列表和贏家（如果贏家手指已離開但需要繼續顯示）
+      // 建立繪製列表
       let drawList = [...touchList];
-      if (winner && selectedId !== null && !touchList.find(t => t.id === selectedId)) {
-        // 贏家手指已離開，但仍需繪製
-        drawList.push(winner);
+      // 如果已選出贏家且贏家不在 touchList 中，從 winner 變數繪製
+      if (winner && selectedId !== null) {
+        const winnerInTouches = touchList.find(t => t.id === selectedId);
+        if (!winnerInTouches) {
+          // 贏家手指已離開，但仍需繪製
+          drawList.push(winner);
+        }
       }
 
       drawList.forEach(t => {
@@ -551,7 +555,7 @@
     resetBtn.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      reset();
+      location.reload();
     });
 
     draw();
