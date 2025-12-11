@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>手指抽籤 v1.3</title>
+  <title>手指抽籤 v1.4</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👆</text></svg>">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -92,7 +92,7 @@
   <div id="settings">
     <label>⏱️ <input type="range" id="delay" min="1" max="5" value="3"> <span id="delay-val">3</span>秒</label>
   </div>
-  <div style="position:fixed;bottom:5px;right:10px;color:rgba(255,255,255,0.3);font-size:12px;">v1.3</div>
+  <div style="position:fixed;bottom:5px;right:10px;color:rgba(255,255,255,0.3);font-size:12px;">v1.4</div>
 
   <script>
     const canvas = document.getElementById('canvas');
@@ -111,7 +111,7 @@
     let isSelecting = false;
     let selectedId = null;
     let animationFrame = null;
-    let delaySeconds = 3;
+    let delaySeconds = parseInt(localStorage.getItem('delaySeconds')) || 3;
     let scanAngle = 0;
     let explosionParticles = [];
     let winner = null;  // 保存贏家資訊
@@ -131,10 +131,16 @@
       { main: '#feca57', glow: '#fed683', particle: '#fee3af' },
     ];
 
+    // 初始化 slider 顯示
+    delaySlider.value = delaySeconds;
+    delayVal.textContent = delaySeconds;
+    timerDisplay.textContent = delaySeconds;
+
     delaySlider.addEventListener('input', () => {
       delaySeconds = parseInt(delaySlider.value);
       delayVal.textContent = delaySeconds;
       timerDisplay.textContent = delaySeconds;
+      localStorage.setItem('delaySeconds', delaySeconds);
     });
 
     function resize() {
@@ -246,13 +252,6 @@
         if (!winnerInTouches) {
           // 贏家手指已離開，但仍需繪製
           drawList.push(winner);
-        }
-      }
-
-      // Debug: 每秒輸出一次狀態
-      if (Math.floor(now / 1000) !== Math.floor((now - 16) / 1000)) {
-        if (selectedId !== null) {
-          console.log('Draw state:', { selectedId, winner, touchList: touchList.length, drawList: drawList.length });
         }
       }
 
@@ -438,8 +437,6 @@
             color: { ...winnerTouch.color },
             particles: []
           };
-          console.log('Winner selected:', selectedId, winner);
-
           // 設定淡出開始時間
           const fadeTime = Date.now();
           touchList.forEach(t => {
