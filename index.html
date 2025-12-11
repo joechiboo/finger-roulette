@@ -64,7 +64,8 @@
       transition: opacity 0.3s;
       box-shadow: 0 0 20px rgba(233,69,96,0.5);
     }
-    #reset.show { opacity: 1; }
+    #reset.show { opacity: 1; pointer-events: auto; }
+    #reset { pointer-events: none; }
     #settings {
       position: fixed;
       top: 20px;
@@ -417,8 +418,12 @@
           const winnerIndex = Math.floor(Math.random() * touchList.length);
           const winnerTouch = touchList[winnerIndex];
           selectedId = winnerTouch.id;
-          // 保存贏家資訊，這樣即使手指離開也能繼續顯示
-          winner = { ...winnerTouch };
+          // 保存贏家資訊（深拷貝），這樣即使手指離開也能繼續顯示
+          winner = {
+            ...winnerTouch,
+            color: { ...winnerTouch.color },
+            particles: []  // 重新建立粒子
+          };
 
           // 設定淡出開始時間
           const fadeTime = Date.now();
@@ -542,16 +547,7 @@
       }
     });
 
-    resetBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      reset();
-    });
-    resetBtn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    });
-    resetBtn.addEventListener('touchend', (e) => {
+    resetBtn.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       e.stopPropagation();
       reset();
