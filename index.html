@@ -342,17 +342,17 @@
         ctx.shadowBlur = 0;
       }
 
-      // 選擇動畫時的高亮圈
+      // 選擇動畫時的高亮圈（用該手指的顏色）
       if (isSelecting && selectedId === null) {
         const highlightIndex = Math.floor(now / 80) % touchList.length;
         const t = touchList[highlightIndex];
         if (t) {
           ctx.beginPath();
           ctx.arc(t.x, t.y, 85, 0, Math.PI * 2);
-          ctx.strokeStyle = '#fff';
-          ctx.lineWidth = 5;
-          ctx.shadowColor = '#fff';
-          ctx.shadowBlur = 20;
+          ctx.strokeStyle = t.color.main;
+          ctx.lineWidth = 8;
+          ctx.shadowColor = t.color.glow;
+          ctx.shadowBlur = 30;
           ctx.stroke();
           ctx.shadowBlur = 0;
         }
@@ -433,7 +433,9 @@
       explosionParticles = [];
       selectedId = null;
       isSelecting = false;
-      stopCountdown();
+      scanAngle = 0;
+      countdown = null;
+      countdownStart = null;
       instruction.style.opacity = '1';
       result.classList.remove('show');
       resetBtn.classList.remove('show');
