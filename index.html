@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>手指抽籤 v2.1</title>
+  <title>手指抽籤 v2.2</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👆</text></svg>">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -93,7 +93,7 @@
     <label>⏱️ <input type="range" id="delay" min="1" max="5" value="3"> <span id="delay-val">3</span>秒</label>
   </div>
   <div id="debug" style="display:none;position:fixed;bottom:25px;left:10px;color:rgba(255,255,255,0.7);font-size:11px;font-family:monospace;background:rgba(0,0,0,0.5);padding:5px 8px;border-radius:5px;"></div>
-  <div id="version" style="position:fixed;bottom:5px;right:10px;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;">v2.1</div>
+  <div id="version" style="position:fixed;bottom:5px;right:10px;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;">v2.2</div>
 
   <script>
     const canvas = document.getElementById('canvas');
@@ -116,7 +116,6 @@
     let delaySeconds = parseInt(localStorage.getItem('delaySeconds')) || 3;
     let scanAngle = 0;
     let explosionParticles = [];
-    let winner = null;  // 保存贏家資訊
 
     const colors = [
       { main: '#ff6b6b', glow: '#ff8787', particle: '#ffaaaa' },
@@ -246,21 +245,10 @@
         ctx.restore();
       }
 
-      // 建立繪製列表
-      let drawList = [...touchList];
-      // 如果已選出贏家且贏家不在 touchList 中，從 winner 變數繪製
-      if (winner && selectedId !== null) {
-        const winnerInTouches = touchList.find(t => t.id === selectedId);
-        if (!winnerInTouches) {
-          // 贏家手指已離開，但仍需繪製
-          drawList.push(winner);
-        }
-      }
-
       // Debug 顯示在頁面上
-      debugEl.textContent = `sel:${selectedId} win:${winner?.id} tch:${touchList.length} drw:${drawList.length}`;
+      debugEl.textContent = `sel:${selectedId} tch:${touchList.length}`;
 
-      drawList.forEach(t => {
+      touchList.forEach(t => {
         // 使用 == 而非 === 來比較，避免類型問題
         const isSelected = selectedId !== null && selectedId == t.id;
 
@@ -428,14 +416,7 @@
           const winnerIndex = Math.floor(Math.random() * touchList.length);
           const winnerTouch = touchList[winnerIndex];
           selectedId = winnerTouch.id;
-          // 保存贏家資訊（深拷貝），這樣即使手指離開也能繼續顯示
-          winner = {
-            id: winnerTouch.id,
-            x: winnerTouch.x,
-            y: winnerTouch.y,
-            color: { ...winnerTouch.color },
-            particles: []
-          };
+
           // 爆發粒子特效
           createExplosion(winnerTouch.x, winnerTouch.y, winnerTouch.color.main);
 
@@ -478,7 +459,6 @@
       particles = [];
       explosionParticles = [];
       selectedId = null;
-      winner = null;
       isSelecting = false;
       scanAngle = 0;
       countdown = null;
@@ -521,14 +501,8 @@
 
     canvas.addEventListener('touchend', (e) => {
       e.preventDefault();
-      if (isSelecting) {
-        // 遊戲結束後，刪除所有觸控點（贏家會從 winner 變數繪製）
-        for (const touch of e.changedTouches) {
-          delete touches[touch.identifier];
-        }
-        // 不自動重置，讓使用者按重置按鈕
-        return;
-      }
+      // 選出贏家後，不處理 touchend，保持畫面
+      if (isSelecting) return;
 
       for (const touch of e.changedTouches) {
         delete touches[touch.identifier];
