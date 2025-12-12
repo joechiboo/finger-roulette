@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>手指抽籤 v2.2</title>
+  <title>手指抽籤 v2.3</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👆</text></svg>">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -93,7 +93,7 @@
     <label>⏱️ <input type="range" id="delay" min="1" max="5" value="3"> <span id="delay-val">3</span>秒</label>
   </div>
   <div id="debug" style="display:none;position:fixed;bottom:25px;left:10px;color:rgba(255,255,255,0.7);font-size:11px;font-family:monospace;background:rgba(0,0,0,0.5);padding:5px 8px;border-radius:5px;"></div>
-  <div id="version" style="position:fixed;bottom:5px;right:10px;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;">v2.2</div>
+  <div id="version" style="position:fixed;bottom:5px;right:10px;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;">v2.3</div>
 
   <script>
     const canvas = document.getElementById('canvas');
@@ -245,15 +245,13 @@
         ctx.restore();
       }
 
-      // Debug 顯示在頁面上
-      debugEl.textContent = `sel:${selectedId} tch:${touchList.length}`;
+      // Debug 顯示在頁面上 - 顯示所有 touch 的 id
+      const touchIds = touchList.map(t => t.id).join(',');
+      debugEl.textContent = `sel:${selectedId} ids:[${touchIds}] tch:${touchList.length}`;
 
       touchList.forEach(t => {
         // 使用 == 而非 === 來比較，避免類型問題
         const isSelected = selectedId !== null && selectedId == t.id;
-
-        // 選出贏家後，只顯示贏家
-        if (selectedId !== null && !isSelected) return;
 
         const alpha = 1;
 
