@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>手指抽籤 v2.3</title>
+  <title>手指抽籤 v2.4</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👆</text></svg>">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -92,8 +92,8 @@
   <div id="settings">
     <label>⏱️ <input type="range" id="delay" min="1" max="5" value="3"> <span id="delay-val">3</span>秒</label>
   </div>
-  <div id="debug" style="display:none;position:fixed;bottom:25px;left:10px;color:rgba(255,255,255,0.7);font-size:11px;font-family:monospace;background:rgba(0,0,0,0.5);padding:5px 8px;border-radius:5px;"></div>
-  <div id="version" style="position:fixed;bottom:5px;right:10px;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;">v2.3</div>
+  <div id="debug" style="position:fixed;bottom:25px;left:10px;color:rgba(255,255,255,0.7);font-size:11px;font-family:monospace;background:rgba(0,0,0,0.5);padding:5px 8px;border-radius:5px;"></div>
+  <div id="version" style="position:fixed;bottom:5px;right:10px;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;">v2.4</div>
 
   <script>
     const canvas = document.getElementById('canvas');
@@ -278,8 +278,10 @@
           const glowAlpha = (0.2 / i) * alpha;
           ctx.beginPath();
           ctx.arc(t.x, t.y, glowRadius, 0, Math.PI * 2);
-          ctx.fillStyle = t.color.glow + Math.floor(glowAlpha * 255).toString(16).padStart(2, '0');
+          ctx.globalAlpha = glowAlpha;
+          ctx.fillStyle = t.color.glow;
           ctx.fill();
+          ctx.globalAlpha = 1;
         }
 
         // 主圓形漸層
@@ -287,9 +289,9 @@
           t.x - radius * 0.3, t.y - radius * 0.3, 0,
           t.x, t.y, radius
         );
-        gradient.addColorStop(0, t.color.glow + Math.floor(alpha * 255).toString(16).padStart(2, '0'));
-        gradient.addColorStop(0.7, t.color.main + Math.floor(alpha * 255).toString(16).padStart(2, '0'));
-        gradient.addColorStop(1, t.color.main + Math.floor(alpha * 200).toString(16).padStart(2, '0'));
+        gradient.addColorStop(0, t.color.glow);
+        gradient.addColorStop(0.7, t.color.main);
+        gradient.addColorStop(1, t.color.main);
 
         ctx.beginPath();
         ctx.arc(t.x, t.y, radius, 0, Math.PI * 2);
@@ -299,7 +301,7 @@
         // 內圈高光
         ctx.beginPath();
         ctx.arc(t.x - radius * 0.25, t.y - radius * 0.25, radius * 0.35, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${0.4 * alpha})`;
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
         ctx.fill();
 
         // 贏家特效
