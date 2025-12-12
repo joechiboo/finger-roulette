@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>手指抽籤 v2.0</title>
+  <title>手指抽籤 v2.1</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👆</text></svg>">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -93,7 +93,7 @@
     <label>⏱️ <input type="range" id="delay" min="1" max="5" value="3"> <span id="delay-val">3</span>秒</label>
   </div>
   <div id="debug" style="display:none;position:fixed;bottom:25px;left:10px;color:rgba(255,255,255,0.7);font-size:11px;font-family:monospace;background:rgba(0,0,0,0.5);padding:5px 8px;border-radius:5px;"></div>
-  <div id="version" style="position:fixed;bottom:5px;right:10px;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;">v2.0</div>
+  <div id="version" style="position:fixed;bottom:5px;right:10px;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;">v2.1</div>
 
   <script>
     const canvas = document.getElementById('canvas');
@@ -274,18 +274,16 @@
         const radius = isSelected ? baseRadius + 25 + pulse * 2 : baseRadius + pulse;
 
         // 環繞粒子
-        if (!isLosing || alpha > 0.5) {
-          if (!t.particles) t.particles = [];
-          while (t.particles.length < 8) {
-            t.particles.push(new Particle(t.x, t.y, t.color.particle, 'orbit'));
-          }
-          t.particles.forEach(p => {
-            p.update(t.x, t.y);
-            ctx.globalAlpha = alpha;
-            p.draw(ctx);
-            ctx.globalAlpha = 1;
-          });
+        if (!t.particles) t.particles = [];
+        while (t.particles.length < 8) {
+          t.particles.push(new Particle(t.x, t.y, t.color.particle, 'orbit'));
         }
+        t.particles.forEach(p => {
+          p.update(t.x, t.y);
+          ctx.globalAlpha = alpha;
+          p.draw(ctx);
+          ctx.globalAlpha = 1;
+        });
 
         // 外層光暈
         const glowLayers = isSelected ? 5 : 3;
